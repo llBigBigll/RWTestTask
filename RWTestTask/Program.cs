@@ -64,40 +64,39 @@ namespace RWTestTask
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-
+            SortedDictionary<string, uint> WordsList = new SortedDictionary<string, uint>();
             string FileName = "C:/Users/nikit/source/repos/RWTestTask/RWTestTask/WarAndPeace.txt";
             string FileOfAnswer = "C:/Users/nikit/source/repos/RWTestTask/RWTestTask/Answer.txt";
-            int linesForOneTask = NumOfLines(FileName) /12;
-            Console.WriteLine(NumOfLines(FileName).ToString());
-            Console.WriteLine(linesForOneTask.ToString());
-
-
-            string[] parts = new string[10];
-
-            using (StreamReader filestream = new StreamReader(FileName))
+            if (NumOfLines(FileName) > 1000)
             {
-                int i = 0;
-                int counter = 0;
+                int linesForOneTask = NumOfLines(FileName) / 12;
 
-                while (filestream.ReadLine() != null)
+
+                string[] parts = new string[10];
+
+                using (StreamReader filestream = new StreamReader(FileName))
                 {
+                    int i = 0;
+                    int counter = 0;
 
-                    string line = filestream.ReadLine();
-                    parts[i] += line;
-                    counter++;
-                    
-                    if (counter >= linesForOneTask && i<=8)
+                    while (filestream.ReadLine() != null)
                     {
-                        counter = 0;
-                        i++;
+
+                        string line = filestream.ReadLine();
+                        parts[i] += line;
+                        counter++;
+
+                        if (counter >= linesForOneTask && i <= 8)
+                        {
+                            counter = 0;
+                            i++;
+                        }
                     }
-                    
                 }
-            }
 
 
-            char[] invchar = InvalidLetters();
-            Task<Dictionary<string, uint>>[] tasks = { Task<Dictionary<string, uint>>.Factory.StartNew(() => TaskWork((parts[0]), invchar)),
+                char[] invchar = InvalidLetters();
+                Task<Dictionary<string, uint>>[] tasks = { Task<Dictionary<string, uint>>.Factory.StartNew(() => TaskWork((parts[0]), invchar)),
                 Task<Dictionary<string, uint>>.Factory.StartNew(() => TaskWork((parts[1]), invchar)),
                 Task<Dictionary<string, uint>>.Factory.StartNew(() => TaskWork((parts[2]), invchar)),
                 Task<Dictionary<string, uint>>.Factory.StartNew(() => TaskWork((parts[3]), invchar)),
@@ -107,47 +106,51 @@ namespace RWTestTask
                 Task<Dictionary<string, uint>>.Factory.StartNew(() => TaskWork((parts[7]), invchar)),
                 Task<Dictionary<string, uint>>.Factory.StartNew(() => TaskWork((parts[8]), invchar)),
                 Task<Dictionary<string, uint>>.Factory.StartNew(() => TaskWork((parts[9]), invchar))};
-            Task.WaitAll(tasks);
+                Task.WaitAll(tasks);
 
-            SortedDictionary<string, uint> WordsList = new SortedDictionary<string, uint>();
 
-            for (int i = 0; i < tasks.Length; i++)
-            {
 
-                foreach (KeyValuePair<string, uint> pair in tasks[i].Result)
+                for (int i = 0; i < tasks.Length; i++)
                 {
 
-                    if (WordsList.ContainsKey(pair.Key))
+                    foreach (KeyValuePair<string, uint> pair in tasks[i].Result)
                     {
-                        WordsList[pair.Key] += pair.Value;
-                    }
-                    else
-                    {
-                        WordsList.Add(pair.Key,pair.Value);
+
+                        if (WordsList.ContainsKey(pair.Key))
+                        {
+                            WordsList[pair.Key] += pair.Value;
+                        }
+                        else
+                        {
+                            WordsList.Add(pair.Key, pair.Value);
+                        }
                     }
                 }
             }
+            else
+            {
+                using (StreamReader filestream = new StreamReader(FileName))
+                {
+                    while (filestream.ReadLine() != null)
+                    {
 
-            //using (StreamReader filestream = new StreamReader(FileName))
-            //{
-            //    while (filestream.ReadLine() != null) {
-                    
-            //        string line = filestream.ReadLine();
-            //        string[] wordsarr = line.Split(InvalidLetters(), StringSplitOptions.RemoveEmptyEntries);
-            //        foreach (string word in wordsarr)
-            //        {
-            //            if (WordsList.ContainsKey(word.ToLower()))
-            //            {
-            //                WordsList[word.ToLower()] += 1;
-                            
-            //            }
-            //            else
-            //            {
-            //                WordsList.Add(word.ToLower(), 1);
-            //            }
-            //        }               
-            //    }
-            //}
+                        string line = filestream.ReadLine();
+                        string[] wordsarr = line.Split(InvalidLetters(), StringSplitOptions.RemoveEmptyEntries);
+                        foreach (string word in wordsarr)
+                        {
+                            if (WordsList.ContainsKey(word.ToLower()))
+                            {
+                                WordsList[word.ToLower()] += 1;
+
+                            }
+                            else
+                            {
+                                WordsList.Add(word.ToLower(), 1);
+                            }
+                        }
+                    }
+                }
+            }
             Console.WriteLine("Файл успешно прочтен");
             using (StreamWriter filestream = new StreamWriter(FileOfAnswer))
             {
