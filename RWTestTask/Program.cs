@@ -16,7 +16,7 @@ namespace RWTestTask
             using (StreamReader strm = new StreamReader(filename))
             {
                 int i = 0;
-                while (strm.ReadLine() != null)
+                while (!strm.EndOfStream)
                 {
                     string a = strm.ReadLine();
                     i++;
@@ -33,6 +33,7 @@ namespace RWTestTask
                     chars.Add(i);
                 }
             }
+
             return chars.ToArray();
         }
         static Dictionary<string, uint> TaskWork(string str, char[] chr)
@@ -65,8 +66,8 @@ namespace RWTestTask
             stopwatch.Start();
 
             SortedDictionary<string, uint> WordsList = new SortedDictionary<string, uint>();
-            string FileName = "C:/Users/nikit/source/repos/RWTestTask/RWTestTask/WarAndPeace.txt";
-            string FileOfAnswer = "C:/Users/nikit/source/repos/RWTestTask/RWTestTask/Answer.txt";
+            string FileName = "C:/Users/nikit/source/repos/llBigBigll/RWTestTask/RWTestTask/WarAndPeace.txt";
+            string FileOfAnswer = "C:/Users/nikit/source/repos/llBigBigll/RWTestTask/RWTestTask/Answer.txt";
             if (NumOfLines(FileName) > 1000)
             {
                 int linesForOneTask = NumOfLines(FileName) / 12;
@@ -79,7 +80,7 @@ namespace RWTestTask
                     int i = 0;
                     int counter = 0;
 
-                    while (filestream.ReadLine() != null)
+                    while (!filestream.EndOfStream)
                     {
 
                         string line = filestream.ReadLine();
@@ -131,22 +132,30 @@ namespace RWTestTask
             {
                 using (StreamReader filestream = new StreamReader(FileName))
                 {
-                    while (filestream.ReadLine() != null)
+                    while (!filestream.EndOfStream)
                     {
 
                         string line = filestream.ReadLine();
-                        string[] wordsarr = line.Split(InvalidLetters(), StringSplitOptions.RemoveEmptyEntries);
-                        foreach (string word in wordsarr)
+                        if (line != null)
                         {
-                            if (WordsList.ContainsKey(word.ToLower()))
-                            {
-                                WordsList[word.ToLower()] += 1;
 
-                            }
-                            else
+                            var wordsarr = line.Split(InvalidLetters(), StringSplitOptions.RemoveEmptyEntries);
+                            foreach (string word in wordsarr)
                             {
-                                WordsList.Add(word.ToLower(), 1);
+                                if (WordsList.ContainsKey(word.ToLower()))
+                                {
+                                    WordsList[word.ToLower()] += 1;
+
+                                }
+                                else
+                                {
+                                    WordsList.Add(word.ToLower(), 1);
+                                }
                             }
+                        }
+                        else
+                        {
+                            Console.WriteLine(line);
                         }
                     }
                 }
@@ -164,6 +173,7 @@ namespace RWTestTask
 
             stopwatch.Stop();
             Console.WriteLine(stopwatch.ElapsedMilliseconds.ToString());
+            Console.ReadKey();
         }
     }
 }
